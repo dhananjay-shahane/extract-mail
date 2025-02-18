@@ -73,6 +73,19 @@ async function scrapeEmails(url: string) {
 }
 
 // Additional validation
+// Additional validation with domain extension check
 function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Basic email format validation
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return false;
+  }
+
+  // Extract domain part and TLD
+  const domainPart = email.split('@')[1];
+  const tld = domainPart.split('.').pop()?.toLowerCase();
+
+  // List of forbidden image extensions
+  const forbiddenExtensions = ['svg', 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'];
+  
+  return !forbiddenExtensions.includes(tld || '');
 }

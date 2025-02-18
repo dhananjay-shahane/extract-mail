@@ -22,49 +22,62 @@ export default function Dashboard() {
   };
 
   const handleSubmit = async () => {
+    // Validate URL input
     if (!url.trim()) {
       setError("Please enter a valid URL");
       return;
     }
 
-    // Check if the URL is already processed
+    // Check if the URL has already been processed
     const existingEntry = contactList.find((entry) => entry.source === url);
     if (existingEntry) {
       toast.error("This URL has already been processed.");
       return;
     }
 
+    // Start loading and clear any previous errors
     setLoading(true);
     setError(null);
 
     try {
+      // Fetch data from the API
       const response = await fetch(
         `/api/scrape?url=${encodeURIComponent(url)}`
       );
       const data = await response.json();
 
+      // Handle API errors
       if (data.error) {
         throw new Error(data.error);
       }
 
-      // Extract and merge emails into one array of entries
-      const newEntries: ContactEntry[] = [
-        ...new Set([
-          ...data.emails.map((email: string) =>
-            JSON.stringify({ email, source: url })
-          ),
-        ]),
-      ].map((item) => JSON.parse(item));
+      // Check if emails are present in the response
+      if (data.emails && data.emails.length > 0) {
+        // Create unique email entries
+        const newEntries: ContactEntry[] = [
+          ...new Set([
+            ...data.emails.map((email: string) =>
+              JSON.stringify({ email, source: url })
+            ),
+          ]),
+        ].map((item) => JSON.parse(item));
 
-      setContactList((prev) => [...prev, ...newEntries]);
-      toast.success("Contact details extracted successfully!");
+        // Update the contact list and show success message
+        setContactList((prev) => [...prev, ...newEntries]);
+        toast.success("Email details extracted successfully!");
+        setUrl(""); // Clear the URL input
+      } else {
+        toast.error("No emails found!");
+      }
     } catch (err: unknown) {
+      // Handle errors
       if (err instanceof Error) {
-        setError(err.message); // Safely accessing the error message
+        setError(err.message);
       } else {
         setError("Failed to fetch contact details");
       }
     } finally {
+      // Stop loading regardless of success or failure
       setLoading(false);
     }
   };
@@ -81,7 +94,6 @@ export default function Dashboard() {
   };
 
   const handleSendBulkMail = () => {
-    // Placeholder logic for sending bulk mail
     toast.error("Bulk mail sending functionality is not implemented yet.");
   };
 
