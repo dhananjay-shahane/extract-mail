@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import Link from 'next/link';
 import Dashboard from "@/app/pages/Dashboard";
+import Home from "@/app/pages/GoogleMapScrape";
 
 export function SidebarDemo() {
   const links = [
@@ -91,7 +92,7 @@ export function SidebarDemo() {
           </div>
         </SidebarBody>
       </Sidebar>
-      <Dashboard />
+     
     </div>
   );
 }
